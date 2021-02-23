@@ -1,0 +1,7 @@
+# Example from an Ansible Playbook
+- hosts: all
+  gather_facts: false
+  tasks:
+    # Check if host are available
+    - name: Ping
+      ping:

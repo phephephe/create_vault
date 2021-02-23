@@ -1,0 +1,32 @@
+---
+- name: This will overwrite Vault and vault password files
+  pause:
+
+- name: show templating results
+  debug:
+    msg: "{{ lookup('template', '../templates/vault.yml.j2') }}"
+
+# Generate vault password
+- name: Generate vault password, if not present
+  set_fact:
+    vault_passwd_1: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+
+- name: Copy Vault 1 password template to localhost
+  template:
+    src: '../templates/vault_passwd.yml.j2'
+    dest: "{{ target_vault_password_file_1 }}"
+    mode: '640'
+  no_log: 'yes'  
+
+- name: Copy Vault clear template to localhost
+  template:
+    src: '../templates/vault.yml.j2'
+    dest: "{{ target_inventory }}/{{ taget_vault_1 }}"
+    mode: '640'
+  no_log: 'yes'  
+
+- name: Encrypt the vault
+  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file_1 }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault_1 }}'
+  no_log: 'yes' 
+
+

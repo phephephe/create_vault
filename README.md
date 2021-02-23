@@ -1,2 +1,2 @@
-# create_vault
-Create and generate secrets to Ansible Vaults 
+# Sihkar-CA
+Very small, simple and sure CA using Ansible.

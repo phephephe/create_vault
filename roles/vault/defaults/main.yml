@@ -1,0 +1,24 @@
+
+target_inventory: '../MyFoE_inventory/development'
+
+taget_vault_1: 'group_vars/all/vault.yml'
+target_vault_password_file_1: '~/.development_vault_password.txt'
+
+taget_vault_2: 'group_vars/all/vault_2.yml'
+target_vault_password_file_2: '~/.development_vault_2_password.txt'
+
+gpg_passwordfile_enabled: false
+
+vault_content:
+  Ansible_User:
+    comment: 'Ansible user password (e.g. Sudo)'
+    key: 'vault_ansible_user_password' 
+    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=32' ) }}"
+  CA:
+    comment: 'CA Private Key password'
+    key: 'vault_ca_private_key_password'
+    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+  Server_PKI:
+    comment: 'Server Private Key password'
+    key: 'vault_server_pki_private_key_password'
+    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"

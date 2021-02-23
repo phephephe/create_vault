@@ -1,0 +1,6 @@
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Create and generate Vault
+      import_role:
+        name: vault      
