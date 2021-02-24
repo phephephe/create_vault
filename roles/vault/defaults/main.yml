@@ -18,6 +18,10 @@ vault_content:
     comment: 'CA Private Key password'
     key: 'vault_ca_private_key_password'
     value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+  CA_dir_encr:
+    comment: 'CA Dir Encryption'
+    key: 'vault_ca_dir_encryption_password'
+    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
   Server_PKI:
     comment: 'Server Private Key password'
     key: 'vault_server_pki_private_key_password'
