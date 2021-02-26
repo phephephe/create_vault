@@ -1,13 +1,17 @@
 
 target_inventory: '../MyFoE_inventory/development'
 
-taget_vault_1: 'group_vars/all/vault.yml'
-target_vault_password_file_1: '~/.development_vault_password.txt'
+taget_vault: 'group_vars/all/vault.yml'
+target_vault_password_file: '~/.development_vault_password.txt'
 
-taget_vault_2: 'group_vars/all/vault_2.yml'
-target_vault_password_file_2: '~/.development_vault_2_password.txt'
-
+# When enables (true) the password file will be encrypted using GPG
 gpg_passwordfile_enabled: false
+
+# List of usernames/email to be used for the encryption as recipient
+gpg_encryption_recipient_list: "[]"
+
+# GPG command and path if needed e.g. gpg or gpg2
+gpg_command: 'gpg'
 
 vault_content:
   Ansible_User:

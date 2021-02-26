@@ -9,24 +9,38 @@
 # Generate vault password
 - name: Generate vault password, if not present
   set_fact:
-    vault_passwd_1: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+    vault_passwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
 
 - name: Copy Vault 1 password template to localhost
   template:
     src: '../templates/vault_passwd.yml.j2'
-    dest: "{{ target_vault_password_file_1 }}"
+    dest: "{{ target_vault_password_file }}"
     mode: '640'
   no_log: 'yes'  
 
 - name: Copy Vault clear template to localhost
   template:
     src: '../templates/vault.yml.j2'
-    dest: "{{ target_inventory }}/{{ taget_vault_1 }}"
+    dest: "{{ target_inventory }}/{{ taget_vault }}"
     mode: '640'
   no_log: 'yes'  
 
 - name: Encrypt the vault
-  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file_1 }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault_1 }}'
+  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
   no_log: 'yes' 
 
+- name: Make correctly formated recipient list string
+  set_fact:
+    recipient_list_str: "{{ recipient_list_str | default('') }} --recipient {{ item }}"
+  loop: "{{ gpg_encryption_recipient_list }}"
 
+- debug:
+    var: recipient_list_str
+
+- name: GPG encrypt the password file
+  shell: "{{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg {{ target_vault_password_file }}"
+  register: gpg_enrypt_command
+  when: gpg_passwordfile_enabled
+
+- debug:
+    var: gpg_enrypt_command
