@@ -25,6 +25,20 @@
     mode: '640'
   no_log: 'yes'  
 
+- name: Copy ansible-vault.sh to be used with gpg
+  template:
+    src: '../templates/gpg_ansible-vault.sh.j2'
+    dest: "~/.ansible-vault.sh"
+    mode: '750'
+  when: gpg_passwordfile_enabled
+
+- name: Copy ansible-vault.sh to be used with clear text
+  template:
+    src: '../templates/txt_ansible-vault.sh.j2'
+    dest: "~/.ansible-vault.sh"
+    mode: '750'
+  when: gpg_passwordfile_enabled
+
 - name: Encrypt the vault
   command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
   no_log: 'yes' 
@@ -44,3 +58,4 @@
 
 - debug:
     var: gpg_enrypt_command
+
