@@ -1,6 +1,17 @@
 ---
-- name: This will overwrite Vault and vault password files
+- name: If user permission not received as yes, fail
+  fail:
+    msg: "The vault files and password files not deleted and new ones not generated. No permission received."
+  when: "not 'yes' in delete_permission"
+
+- name: "This will overwrite the vault and vault password files are you sure to continue"
   pause:
+    prompt: |
+          ***************************************************
+                           ARE YOU SURE? 
+                  If not then ctrl+C then 'A' = abort
+                  If you are sure then (ctrl+C then 'C' = continue
+          ***************************************************
 
 # Generate vault password
 - name: Generate vault password, if not present
@@ -14,6 +25,12 @@
     mode: '640'
   no_log: 'yes' 
   when: not gpg_passwordfile_enabled 
+
+- name: Make sure that any clear password files are not present when gpg is used
+  file:
+    path: "{{ target_vault_password_file }}"
+    state: 'absent'
+  when: gpg_passwordfile_enabled
 
 - name: Copy Vault clear template to localhost
   template:
@@ -40,22 +57,41 @@
   set_fact:
     recipient_list_str: "{{ recipient_list_str | default('') }} --recipient {{ item }}"
   loop: "{{ gpg_encryption_recipient_list }}"
-
-- debug:
-    var: recipient_list_str
-
-- name: GPG encrypt the password file
-  shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
-  register: gpg_enrypt_command
-  no_log: 'yes' 
   when: gpg_passwordfile_enabled
 
 - debug:
-    var: gpg_enrypt_command
+    var: recipient_list_str
+  when: gpg_passwordfile_enabled
 
-- name: Encrypt the vault
-  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
+- name: GPG encrypt the password file
+  shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
   no_log: 'yes' 
+  when: gpg_passwordfile_enabled
 
+- name: Encrypt the Ansible vault by using clear txt password file
+  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
+  no_log: 'no' 
+  when: not gpg_passwordfile_enabled
 
+- name: Encrypt the Ansible vault using pgp encrypted password file
+  command: 'ansible-vault encrypt --vault-password-file "~/.ansible-vault.sh" --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
+  no_log: 'no' 
+  when: gpg_passwordfile_enabled
 
+- pause:
+    seconds: 1
+    prompt: |
+          =========================
+          New clear text Ansible vault password file created with a random password.
+          New Ansible Vault created with generated random passwords.
+          =========================
+  when: not gpg_passwordfile_enabled 
+
+- pause:
+    seconds: 1
+    prompt: |
+          =========================
+          New GPG encrypted Ansible vault password file created with a random password.
+          New Ansible Vault created with generated random passwords.
+          =========================
+  when: gpg_passwordfile_enabled        

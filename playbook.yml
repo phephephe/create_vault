@@ -1,5 +1,10 @@
 - hosts: localhost
   gather_facts: true
+  vars_prompt:
+    - name: "delete_permission"
+      prompt: "Delete all current vaults and password files? (yes/no)"
+      default: 'no'
+      private: 'no'
   tasks:
     - name: Create and generate Vault
       import_role:
