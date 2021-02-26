@@ -2,10 +2,6 @@
 - name: This will overwrite Vault and vault password files
   pause:
 
-- name: show templating results
-  debug:
-    msg: "{{ lookup('template', '../templates/vault.yml.j2') }}"
-
 # Generate vault password
 - name: Generate vault password, if not present
   set_fact:
@@ -51,6 +47,7 @@
 - name: GPG encrypt the password file
   shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
   register: gpg_enrypt_command
+  no_log: 'yes' 
   when: gpg_passwordfile_enabled
 
 - debug:
