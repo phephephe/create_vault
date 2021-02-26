@@ -28,5 +28,5 @@ vault_content:
     value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
   Server_PKI:
     comment: 'Server Private Key password'
-    key: 'vault_server_pki_private_key_password'
+    key: 'vault_server_pki_private_key_password_{{ inventory_hostname }}'
     value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
