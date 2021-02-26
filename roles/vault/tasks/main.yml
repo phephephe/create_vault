@@ -16,7 +16,8 @@
     src: '../templates/vault_passwd.yml.j2'
     dest: "{{ target_vault_password_file }}"
     mode: '640'
-  no_log: 'yes'  
+  no_log: 'yes' 
+  when: not gpg_passwordfile_enabled 
 
 - name: Copy Vault clear template to localhost
   template:
@@ -37,11 +38,7 @@
     src: '../templates/txt_ansible-vault.sh.j2'
     dest: "~/.ansible-vault.sh"
     mode: '750'
-  when: gpg_passwordfile_enabled
-
-- name: Encrypt the vault
-  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
-  no_log: 'yes' 
+  when: not gpg_passwordfile_enabled
 
 - name: Make correctly formated recipient list string
   set_fact:
@@ -52,10 +49,16 @@
     var: recipient_list_str
 
 - name: GPG encrypt the password file
-  shell: "{{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg {{ target_vault_password_file }}"
+  shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
   register: gpg_enrypt_command
   when: gpg_passwordfile_enabled
 
 - debug:
     var: gpg_enrypt_command
+
+- name: Encrypt the vault
+  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
+  no_log: 'yes' 
+
+
 
