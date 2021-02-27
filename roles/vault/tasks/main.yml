@@ -1,10 +1,8 @@
 ---
 
-- name: show templating results
-  debug:
-    msg: "{{ lookup('template', '../templates/vault.yml.j2') }}"
-
-- pause:
+#- name: show templating results
+#  debug:
+#    msg: "{{ lookup('template', '../templates/vault.yml.j2') }}"
   
 - name: If user permission not received as yes, fail
   fail:
