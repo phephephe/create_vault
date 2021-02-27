@@ -13,20 +13,31 @@ gpg_encryption_recipient_list: "[]"
 # GPG command and path if needed e.g. gpg or gpg2
 gpg_command: 'gpg'
 
-vault_content:
+vault_content_general:
   Ansible_User:
     comment: 'Ansible user password (e.g. Sudo)'
-    key: 'vault_ansible_user_password' 
-    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=32' ) }}"
+    name: 'vault_ansible_user_password' 
+    password_type: 'normal'
+
+vault_content_host:
   CA:
     comment: 'CA Private Key password'
-    key: 'vault_ca_private_key_password'
-    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+    name: 'vault_ca_private_key_password'
+    password_type: 'normal'
+    host: 
+      - ca
   CA_dir_encr:
     comment: 'CA Dir Encryption'
-    key: 'vault_ca_dir_encryption_password'
-    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+    name: 'vault_ca_dir_encryption_password'
+    password_type: 'normal'
+    host: 
+      - ca
   Server_PKI:
     comment: 'Server Private Key password'
-    key: 'vault_server_pki_private_key_password_{{ inventory_hostname }}'
-    value: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+    name: 'vault_server_pki_private_key_password'
+    password_type: 'simple'
+    host:
+      - ca
+      - tester1
+      - tester2
+  
