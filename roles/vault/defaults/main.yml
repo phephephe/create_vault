@@ -1,7 +1,11 @@
 
+# Location of the target project's inventory
 target_inventory: '../MyFoE_inventory/development'
 
+# Location of the vault file of the target project
 taget_vault: 'group_vars/all/vault.yml'
+
+# Location of the vault password file
 target_vault_password_file: '~/.development_vault_password.txt'
 
 # When enables (true) the password file will be encrypted using GPG
@@ -13,28 +17,54 @@ gpg_encryption_recipient_list: "[]"
 # GPG command and path if needed e.g. gpg or gpg2
 gpg_command: 'gpg'
 
+# Add here more variables that are generic and not host specific.
+#vault_content_general:
+#  < Informative nam>:
+#    comment: '< comment that will be stored to the vault>'
+#    name: '< variable name to store the password >' 
+#    # Password type possible values: 'simple', 'normal', 'human'
+#    # These values are used on vault.yml.j2 to select different type of password quality
+#    password_type: 'normal'
+
+# 'Global' variables that are generic and not host specific.
+# Default example values, Should be overwrite using values on inventory 
 vault_content_general:
   Ansible_User:
     comment: 'Ansible user password (e.g. Sudo)'
     name: 'vault_ansible_user_password' 
     password_type: 'normal'
 
+# Host specific values.
+#  < Informative nam>:
+#    comment: '< comment that will be stored to the vault>'
+#    name: '< variable name to store the password >' 
+#    # Password type possible values: 'simple', 'normal', 'human'
+#    # These values are used on vault.yml.j2 to select different type of password quality
+#    password_type: 'normal'
+#    # List of host that normally would be ansible_hostnames and will be added end of the name parameter
+#    host:
+#      - ca
+#      - tester1
+#      - tester2
+
+
+# Host specific values.
 vault_content_host:
   CA:
     comment: 'CA Private Key password'
-    name: 'vault_ca_private_key_password'
+    name: 'vault_ca_private_key_password_'
     password_type: 'normal'
     host: 
       - ca
   CA_dir_encr:
     comment: 'CA Dir Encryption'
-    name: 'vault_ca_dir_encryption_password'
+    name: 'vault_ca_dir_encryption_password_'
     password_type: 'normal'
     host: 
       - ca
   Server_PKI:
     comment: 'Server Private Key password'
-    name: 'vault_server_pki_private_key_password'
+    name: 'vault_server_pki_private_key_password_'
     password_type: 'simple'
     host:
       - ca

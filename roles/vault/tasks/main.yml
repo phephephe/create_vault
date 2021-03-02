@@ -1,10 +1,5 @@
 ---
-
-#- name: show templating results
-#  debug:
-#    msg: "{{ lookup('template', '../templates/vault.yml.j2') }}"
-  
-- name: If user permission not received as yes, fail
+ - name: If user permission not received as yes, fail
   fail:
     msg: "The vault files and password files not deleted and new ones not generated. No permission received."
   when: "not 'yes' in delete_permission"
@@ -19,12 +14,11 @@
                   If you are sure then (ctrl+C then 'C' = continue
           ***************************************************
 
-# Generate vault password
 - name: Generate vault password, if not present
   set_fact:
     vault_passwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
 
-- name: Copy Vault 1 password template to localhost
+- name: Copy Vault password template to localhost
   template:
     src: '../templates/vault_passwd.yml.j2'
     dest: "{{ target_vault_password_file }}"
@@ -32,7 +26,7 @@
   no_log: 'yes' 
   when: not gpg_passwordfile_enabled 
 
-- name: Make sure that any clear password files are not present when gpg is used
+- name: Make sure that any clear text password files are not present when gpg is used
   file:
     path: "{{ target_vault_password_file }}"
     state: 'absent'
@@ -76,12 +70,12 @@
 
 - name: Encrypt the Ansible vault by using clear txt password file
   command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
-  no_log: 'no' 
+  no_log: 'yes' 
   when: not gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault using pgp encrypted password file
   command: 'ansible-vault encrypt --vault-password-file "~/.ansible-vault.sh" --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
-  no_log: 'no' 
+  no_log: 'yes' 
   when: gpg_passwordfile_enabled
 
 - pause:

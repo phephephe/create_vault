@@ -6,6 +6,6 @@
       default: 'no'
       private: 'no'
   tasks:
-    - name: Create and generate Vault
+    - name: Create and generate the Vault
       import_role:
         name: vault      
