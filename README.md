@@ -17,7 +17,7 @@ Following command is used to run the play.
 ansible-playbook playbook
 
 
-This play will generated passwords to Ansible vault 
+This play will generated passwords to Ansible vault to
 * "{{ target_inventory }}/{{ taget_vault }}"
 
 The generated passwords are defined using two variables:
