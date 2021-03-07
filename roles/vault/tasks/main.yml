@@ -11,7 +11,7 @@
                            ARE YOU SURE? 
                            Yes, press 'Enter'
                   If not then ctrl+C then 'A' = abort
-                  If you are sure then (ctrl+C then 'C' = continue
+                  If you are sure then (ctrl+C then 'C' = continue)
           ***************************************************
 
 - name: Generate vault password, if not present
@@ -23,7 +23,7 @@
     src: 'vault_passwd.yml.j2'
     dest: "{{ target_vault_password_file }}"
     mode: '640'
-  no_log: 'yes' 
+  no_log: 'no' 
   when: not gpg_passwordfile_enabled 
 
 - name: Make sure that any clear text password files are not present when gpg is used
@@ -37,7 +37,7 @@
     src: 'vault.yml.j2'
     dest: "{{ target_inventory }}/{{ target_vault }}"
     mode: '640'
-  no_log: 'yes'  
+  no_log: 'no'  
 
 - name: Copy ansible-vault.sh to be used with gpg
   template:

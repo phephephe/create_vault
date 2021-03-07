@@ -1,17 +1,29 @@
+{% macro hash_passwd(hash,passwd) %}
+mkpasswd --method={{ hash }} --salt {{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=8) }} {{ passwd }}
+{% endmacro %}
 {% raw %}
 #
 # Ansible Generated Vault content, please do not add manually any new values
 #
+
 {% endraw %}
 {% for item in vault_content_general.values() %}
 
-#{{ item.comment }}
+# {{ item.comment }}
 {% if item.password_type == 'simple' %}
-{{ item.name }}: '{{ lookup('password', '/dev/null length=62' ) }}'
+{{ item.name }}: '{{ lookup('password', '/dev/null length=62') }}'
 {% elif item.password_type == 'normal'  %}
 {{ item.name }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% elif item.password_type == 'human'  %}
-{{ item.name }}: '{{ lookup('password', '/dev/null length=22' ) }}'
+{{ item.name }}: '{{ lookup('password', '/dev/null length=22') }}'
+{% elif item.password_type == 'unix-hash-sha256'  %}
+{% set passwd_to_hash = "{{ lookup('password', '/dev/null length=22' ) }}" %}
+{{ item.name }}: '{{ passwd_to_hash }}'
+{{ item.name }}-sha256: '{{ hash_passwd('SHA-256', passwd_to_hash) }} ) }}'
+{% elif item.password_type == 'unix-hash-sha512'  %}
+{% set passwd_to_hash = "{{ lookup('password', '/dev/null length=22') }}" %}
+{{ item.name }}: '{{ passwd_to_hash }}'
+{{ item.name }}-sha512: '{{ hash_passwd('SHA-512', passwd_to_hash) }}'
 {% else %}
 {{ item.name }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}
@@ -21,13 +33,21 @@
 {% for vault in vault_content_host -%}
 {% for host in vault_content_host[vault].host %}
 
-#{{ vault_content_host[vault].comment }} for host {{ host }}
+# {{ vault_content_host[vault].comment }} for host {{ host }}
 {% if vault_content_host[vault].password_type == 'simple' %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null length=62' ) }}'
 {% elif vault_content_host[vault].password_type == 'normal'  %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% elif vault_content_host[vault].password_type == 'human'  %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null length=22' ) }}' 
+{% elif vault_content_host[vault].password_type == 'unix-hash-sha256' %}
+{% set passwd_to_hash = "{{ lookup('password', '/dev/null length=22') }}" %}
+{{ vault_content_host[vault].name }}{{ host }}: '{{ passwd_to_hash }}'
+{{ vault_content_host[vault].name }}{{ host }}-sha256: '{{ hash_passwd(SHA-256,{{ lookup('password', '/dev/null length=22') }} ) }}'
+{% elif vault_content_host[vault].password_type == 'unix-hash-sha512' %}
+{% set passwd_to_hash = "{{ lookup('password', '/dev/null length=22') }}" %}
+{{ vault_content_host[vault].name }}{{ host }}: '{{ passwd_to_hash }}'
+{{ vault_content_host[vault].name }}{{ host }}-sha512: '{{ hash_passwd(SHA-512,{{ lookup('password', '/dev/null length=22') }} ) }}'
 {% else %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}

@@ -33,6 +33,10 @@ vault_content_general:
     comment: 'Ansible user password (e.g. Sudo)'
     name: 'vault_ansible_user_password' 
     password_type: 'normal'
+  Example_User_1:
+    comment: 'User password in Unix hashed format (e.g. for user creation tasks)'
+    name: 'vault_user_password_hash_512' 
+    password_type: 'unix-hash-sha512'
 
 # Host specific values.
 #  < Informative name >:
