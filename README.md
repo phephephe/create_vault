@@ -21,7 +21,7 @@ If vault file has already been creted, you need to provide the vault password to
 ansible-playbook --vault-id ~/.vault_password.txt playbook.yml
 ```
 
-This play will generated passwords to Ansible vault to
+This play will generated passwords to Ansible vault to:
 * "{{ target_inventory }}/{{ target_vault }}"
 
 The generated passwords are defined using two variables:
