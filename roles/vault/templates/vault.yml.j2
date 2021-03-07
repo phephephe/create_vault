@@ -12,7 +12,6 @@
 {{ item.name }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% elif item.password_type == 'human'  %}
 {{ item.name }}: '{{ lookup('password', '/dev/null length=22') }}'
-
 {% elif item.password_type == 'unix-hash-sha256' %}
 {% set passwd_to_hash = lookup('password', '/dev/null length=22') %}
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
