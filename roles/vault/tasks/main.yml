@@ -46,13 +46,6 @@
     mode: '750'
   when: gpg_passwordfile_enabled
 
-- name: Copy ansible-vault.sh to be used with clear text
-  template:
-    src: 'txt_ansible-vault.sh.j2'
-    dest: "~/.ansible-vault.sh"
-    mode: '750'
-  when: not gpg_passwordfile_enabled
-
 - name: Make correctly formated recipient list string
   set_fact:
     recipient_list_str: "{{ recipient_list_str | default('') }} --recipient {{ item }}"
@@ -74,7 +67,7 @@
   when: not gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault using pgp encrypted password file
-  command: 'ansible-vault encrypt --vault-password-file "~/.ansible-vault.sh" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
+  shell: 'ansible-vault encrypt --vault-password-file $(cat {{ target_vault_password_file }})--encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
   no_log: 'yes' 
   when: gpg_passwordfile_enabled
 
@@ -90,7 +83,7 @@
 - pause:
     seconds: 1
     prompt: |
-          =========================
+          ========================
           New GPG encrypted Ansible Vault password file created with a random password.
           New Ansible Vault created with generated random passwords.
           =========================
