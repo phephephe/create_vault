@@ -1,6 +1,6 @@
 
 # Location of the target project's inventory
-target_inventory: '{{ playbook_dir }}'
+target_inventory: '{{ playbook_dir }}/inventory'
 
 # Location of the vault file of the target project
 target_vault: 'group_vars/all/vault.yml'
