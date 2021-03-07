@@ -1,12 +1,12 @@
 
 # Location of the target project's inventory
-target_inventory: '../MyFoE_inventory/development'
+target_inventory: '{{ playbook_dir }}'
 
 # Location of the vault file of the target project
-taget_vault: 'group_vars/all/vault.yml'
+target_vault: 'group_vars/all/vault.yml'
 
 # Location of the vault password file
-target_vault_password_file: '~/.development_vault_password.txt'
+target_vault_password_file: '~/.vault_password.txt'
 
 # When enables (true) the password file will be encrypted using GPG
 gpg_passwordfile_enabled: false
@@ -19,7 +19,7 @@ gpg_command: 'gpg'
 
 # Add here more variables that are generic and not host specific.
 #vault_content_general:
-#  < Informative nam>:
+#  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
 #    # Password type possible values: 'simple', 'normal', 'human'
@@ -35,7 +35,7 @@ vault_content_general:
     password_type: 'normal'
 
 # Host specific values.
-#  < Informative nam>:
+#  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
 #    # Password type possible values: 'simple', 'normal', 'human'

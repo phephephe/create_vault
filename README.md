@@ -18,7 +18,7 @@ ansible-playbook playbook
 
 
 This play will generated passwords to Ansible vault to
-* "{{ target_inventory }}/{{ taget_vault }}"
+* "{{ target_inventory }}/{{ target_vault }}"
 
 The generated passwords are defined using two variables:
 * vault_content_general
