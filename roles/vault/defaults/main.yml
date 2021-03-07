@@ -22,7 +22,7 @@ gpg_command: 'gpg'
 #  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
-#    # Password type possible values: 'simple', 'normal', 'human'
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
 #    # These values are used on vault.yml.j2 to select different type of password quality
 #    password_type: 'normal'
 
@@ -35,14 +35,14 @@ vault_content_general:
     password_type: 'normal'
   Example_User_1:
     comment: 'User password in Unix hashed format (e.g. for user creation tasks)'
-    name: 'vault_user_password_hash_512' 
+    name: 'vault_user_password_hash'
     password_type: 'unix-hash-sha512'
 
 # Host specific values.
 #  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
-#    # Password type possible values: 'simple', 'normal', 'human'
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
 #    # These values are used on vault.yml.j2 to select different type of password quality
 #    password_type: 'normal'
 #    # List of host that normally would be ansible_hostnames and will be added end of the name parameter
