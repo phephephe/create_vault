@@ -58,17 +58,17 @@
 
 - name: GPG encrypt the password file
   shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
-  no_log: 'yes' 
+  no_log: 'yes'
   when: gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault by using clear txt password file
   command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
-  no_log: 'yes' 
+  no_log: 'yes'
   when: not gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault using pgp encrypted password file
-  shell: 'ansible-vault encrypt --vault-password-file $(cat {{ target_vault_password_file }})--encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
-  no_log: 'yes' 
+  shell: 'ansible-vault encrypt --vault-password-file "$(cat {{ target_vault_password_file }})" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
+  no_log: 'yes'
   when: gpg_passwordfile_enabled
 
 - pause:
