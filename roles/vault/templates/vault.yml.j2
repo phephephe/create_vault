@@ -16,12 +16,12 @@
 {% set passwd_to_hash = lookup('password', '/dev/null length=22') %}
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ item.name }}: '{{ passwd_to_hash }}'
-{{ item.name }}-sha256: '{{ passwd_to_hash | password_hash('sha256', salt) }}'
+{{ item.name }}_sha256: '{{ passwd_to_hash | password_hash('sha256', salt) }}'
 {% elif item.password_type == 'unix-hash-sha512' %}
 {% set passwd_to_hash = lookup('password', '/dev/null length=22') %}
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ item.name }}: '{{ passwd_to_hash }}'
-{{ item.name }}-sha512: '{{ passwd_to_hash | password_hash('sha512', salt) }}'
+{{ item.name }}_sha512: '{{ passwd_to_hash | password_hash('sha512', salt) }}'
 {% else %}
 {{ item.name }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}
@@ -42,12 +42,12 @@
 {% set passwd_to_hash = lookup('password', '/dev/null length=22') %}
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ passwd_to_hash }}'
-{{ vault_content_host[vault].name }}{{ host }}-sha256: '{{ passwd_to_hash | password_hash('sha256', salt) }}'
+{{ vault_content_host[vault].name }}{{ host }}_sha256: '{{ passwd_to_hash | password_hash('sha256', salt) }}'
 {% elif vault_content_host[vault].password_type == 'unix-hash-sha512' %}
 {% set passwd_to_hash = lookup('password', '/dev/null length=22') %}
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ passwd_to_hash }}'
-{{ vault_content_host[vault].name }}{{ host }}-sha512: '{{ passwd_to_hash | password_hash('sha512', salt ) }}'
+{{ vault_content_host[vault].name }}{{ host }}_sha512: '{{ passwd_to_hash | password_hash('sha512', salt ) }}'
 {% else %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}
