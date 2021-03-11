@@ -76,7 +76,7 @@
 - name: Encrypt the Ansible vault using pgp encrypted password file
   shell: 'ansible-vault encrypt --vault-password-file "$(cat {{ target_vault_password_file }})" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
   no_log: 'yes'
-when: gpg_passwordfile_enabled
+  when: gpg_passwordfile_enabled
 
 - pause:
     seconds: 1
