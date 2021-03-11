@@ -11,7 +11,7 @@
                            ARE YOU SURE? 
                            Yes, press 'Enter'
                   If not then ctrl+C then 'A' = abort
-                  If you are sure then (ctrl+C then 'C' = continue
+                  If you are sure then (ctrl+C then 'C' = continue)
           ***************************************************
 
 - name: Generate vault password, if not present
@@ -20,10 +20,10 @@
 
 - name: Copy Vault password template to localhost
   template:
-    src: '../templates/vault_passwd.yml.j2'
+    src: 'vault_passwd.yml.j2'
     dest: "{{ target_vault_password_file }}"
     mode: '640'
-  no_log: 'yes' 
+  no_log: 'yes'
   when: not gpg_passwordfile_enabled 
 
 - name: Make sure that any clear text password files are not present when gpg is used
@@ -34,21 +34,21 @@
 
 - name: Copy Vault clear template to localhost
   template:
-    src: '../templates/vault.yml.j2'
-    dest: "{{ target_inventory }}/{{ taget_vault }}"
+    src: 'vault.yml.j2'
+    dest: "{{ target_inventory }}/{{ target_vault }}"
     mode: '640'
   no_log: 'yes'  
 
 - name: Copy ansible-vault.sh to be used with gpg
   template:
-    src: '../templates/gpg_ansible-vault.sh.j2'
+    src: 'gpg_ansible-vault.sh.j2'
     dest: "~/.ansible-vault.sh"
     mode: '750'
   when: gpg_passwordfile_enabled
 
 - name: Copy ansible-vault.sh to be used with clear text
   template:
-    src: '../templates/txt_ansible-vault.sh.j2'
+    src: 'txt_ansible-vault.sh.j2'
     dest: "~/.ansible-vault.sh"
     mode: '750'
   when: not gpg_passwordfile_enabled
@@ -65,17 +65,22 @@
 
 - name: GPG encrypt the password file
   shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
-  no_log: 'yes' 
+  no_log: 'yes'
   when: gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault by using clear txt password file
-  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
-  no_log: 'yes' 
+  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
+  no_log: 'yes'
   when: not gpg_passwordfile_enabled
 
 - name: Encrypt the Ansible vault using pgp encrypted password file
-  command: 'ansible-vault encrypt --vault-password-file "~/.ansible-vault.sh" --encrypt-vault-id default {{ target_inventory }}/{{ taget_vault }}'
+<<<<<<< HEAD
+  shell: 'ansible-vault encrypt --vault-password-file "$(cat {{ target_vault_password_file }})" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
+  no_log: 'yes'
+=======
+  command: 'ansible-vault encrypt --vault-password-file "~/.ansible-vault.sh" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
   no_log: 'yes' 
+>>>>>>> parent of 51fdbd8... Replaced extra shell script with in-line solutoin
   when: gpg_passwordfile_enabled
 
 - pause:

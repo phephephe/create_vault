@@ -1,12 +1,12 @@
 
 # Location of the target project's inventory
-target_inventory: '../MyFoE_inventory/development'
+target_inventory: '{{ playbook_dir }}/inventory'
 
 # Location of the vault file of the target project
-taget_vault: 'group_vars/all/vault.yml'
+target_vault: 'group_vars/all/vault.yml'
 
 # Location of the vault password file
-target_vault_password_file: '~/.development_vault_password.txt'
+target_vault_password_file: '~/.vault_password.txt'
 
 # When enables (true) the password file will be encrypted using GPG
 gpg_passwordfile_enabled: false
@@ -19,10 +19,10 @@ gpg_command: 'gpg'
 
 # Add here more variables that are generic and not host specific.
 #vault_content_general:
-#  < Informative nam>:
+#  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
-#    # Password type possible values: 'simple', 'normal', 'human'
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
 #    # These values are used on vault.yml.j2 to select different type of password quality
 #    password_type: 'normal'
 
@@ -33,12 +33,16 @@ vault_content_general:
     comment: 'Ansible user password (e.g. Sudo)'
     name: 'vault_ansible_user_password' 
     password_type: 'normal'
+  Example_User_1:
+    comment: 'User password in Unix hashed format (e.g. for user creation tasks)'
+    name: 'vault_user_password_hash'
+    password_type: 'unix-hash-sha512'
 
 # Host specific values.
-#  < Informative nam>:
+#  < Informative name >:
 #    comment: '< comment that will be stored to the vault>'
 #    name: '< variable name to store the password >' 
-#    # Password type possible values: 'simple', 'normal', 'human'
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
 #    # These values are used on vault.yml.j2 to select different type of password quality
 #    password_type: 'normal'
 #    # List of host that normally would be ansible_hostnames and will be added end of the name parameter

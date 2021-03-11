@@ -13,12 +13,16 @@ Make backup the vault.yml and password file before running the following play, i
 When using GPG encryption on the password file, make sure that GPG is ready to be used. E.g. add key info to the local inventory/group_vars/all/mail.yml 'gpg_encryption_recipient_list' variable. GPG private key should be on hardware e.g. Yubikey.
 
 Following command is used to run the play.
+```
+ansible-playbook playbook.yml
+```
+If vault file has already been creted, you need to provide the vault password to rerun the playbook. Example below provides example with default settings:
+```
+ansible-playbook --vault-id ~/.vault_password.txt playbook.yml
+```
 
-ansible-playbook playbook
-
-
-This play will generated passwords to Ansible vault to
-* "{{ target_inventory }}/{{ taget_vault }}"
+This play will generated passwords to Ansible vault to:
+* "{{ target_inventory }}/{{ target_vault }}"
 
 The generated passwords are defined using two variables:
 * vault_content_general
@@ -29,7 +33,7 @@ vault_content_general:
     < Informative nam>:`
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
 ```
@@ -44,7 +48,7 @@ Generated content on the Ansible Vault is like:
   < Informative nam>:
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
     # List of host that normally would be ansible_hostnames and will be added end of the name parameter
@@ -84,3 +88,11 @@ Q - quit
   * Change to 4096bit RSA
 * generate
 ```
+
+
+Supported password format and their complexities:
+* normal (default and fallback option): 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _").
+* simple: 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _"). 
+* human: 22 characters, ascii lower random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _").
+* unix-hash-sha256: `human` + salted sha256 hash (both password and hash provided)
+* unix-hash-sha512: `human` + salted sha512 hash (both password and hash provided)
