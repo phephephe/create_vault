@@ -91,8 +91,8 @@ Q - quit
 
 
 Supported password format and their complexities:
-* normal (default and fallback option): 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _").
-* simple: 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _"). 
-* human: 22 characters, ascii lower random mix of upper and lowercase ASCII letters, the numbers 0-9 and punctuation (". , : - _").
+* normal (default and fallback option): 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and full punctuation.
+* simple: 62 characters, random mix of upper and lowercase ASCII letters, the numbers 0-9 and limited punctuation (". , : - _"). 
+* human: 22 characters, ascii lower random mix of upper and lowercase ASCII letters, the numbers 0-9 and limited punctuation (". , : - _").
 * unix-hash-sha256: `human` + salted sha256 hash (both password and hash provided)
 * unix-hash-sha512: `human` + salted sha512 hash (both password and hash provided)
