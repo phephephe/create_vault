@@ -16,10 +16,39 @@ Following command is used to run the play.
 ```
 ansible-playbook playbook.yml
 ```
-If vault file has already been creted, you need to provide the vault password to rerun the playbook. Example below provides example with default settings:
+Also, following command can be used when real inventory file is else where
 ```
-ansible-playbook --vault-id ~/.vault_password.txt playbook.yml
+ansible-playbook -i INVENTORY playbook.yml
 ```
+
+If vault file has already been created, you need to provide the vault password to rerun the playbook. ('ERROR! Attempting to decrypt but no vault secrets found')
+Example below provides example with default settings:
+```
+ansible-playbook --vault-id VAULT_PASSWORD_FILE playbook.yml
+```
+or 
+```
+ansible-playbook --vault-password-file VAULT_PASSWORD_FILES playbook.yml
+```
+or
+```
+ansible-playbook -i INVENTORY --vault-password-file VAULT_PASSWORD_FILES playbook.yml
+```
+
+For example first run
+```
+ansible-playbook -i ../MyFoE_inventory/development/hosts playbook.yml
+```
+
+For example subsequent runs
+```
+ansible-playbook -i ../MyFoE_inventory/development/hosts --vault-password-file ~/.vault_password.txt playbook.yml
+```
+Or also when gpg is used (works also without gpg)
+```
+ansible-playbook -i ../MyFoE_inventory/development/hosts --vault-password-file ~/.ansible-vault.sh playbook.yml
+```
+
 
 This play will generated passwords to Ansible vault to:
 * "{{ target_inventory }}/{{ target_vault }}"
