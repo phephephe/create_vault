@@ -1,0 +1,78 @@
+---
+
+
+# List of usernames/email to be used for the encryption as recipient
+gpg_encryption_recipient_list: ['']
+
+
+# Add here more variables that are generic and not host specific.
+#vault_content_general:
+#  < Informative name >:
+#    comment: '< comment that will be stored to the vault>'
+#    name: '< variable name to store the password >' 
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
+#    # These values are used on vault.yml.j2 to select different type of password quality
+#    password_type: 'normal'
+#    password: <static password content>
+
+# 'Global' variables that are generic and not host specific.
+# Default example values, Should be overwrite using values on inventory 
+vault_content_general:
+  Ansible_User:
+    comment: 'Ansible user password (e.g. Sudo)'
+    name: 'vault_ansible_user_password' 
+    password_type: 'normal'
+  Example_User_1:
+    comment: 'User password in Unix hashed format (e.g. for user creation tasks)'
+    name: 'vault_user_password_hash'
+    password_type: 'unix-hash-sha512'
+  Example_User_2:
+    comment: 'User password in clear and static i.e not generated'
+    name: 'vault_user2_password'
+    password_type: 'static'
+    password: 'ChangemeA4!'
+
+# Host specific values.
+#  < Informative name >:
+#    comment: '< comment that will be stored to the vault>'
+#    name: '< variable name to store the password >' 
+#    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
+#    # These values are used on vault.yml.j2 to select different type of password quality
+#    password_type: 'normal'
+#    password: <static password content>
+#    # List of host that normally would be ansible_hostnames and will be added end of the name parameter
+#    host:
+#      - ca
+#      - tester1
+#      - tester2
+
+
+# Host specific values.
+vault_content_host:
+  CA:
+    comment: 'CA Private Key password'
+    name: 'vault_ca_private_key_password_'
+    password_type: 'normal'
+    host: 
+      - ca
+  CA_dir_encr:
+    comment: 'CA Dir Encryption'
+    name: 'vault_ca_dir_encryption_password_'
+    password_type: 'normal'
+    host: 
+      - ca
+  Server_PKI:
+    comment: 'Server Private Key password'
+    name: 'vault_server_pki_private_key_password_'
+    password_type: 'simple'
+    host:
+      - ca
+      - tester1
+      - tester2
+  Server_PKI:
+    comment: 'Linux password'
+    name: 'vault_linux_password_'
+    password_type: 'static'
+    host:
+      - linux1
+    password: 'ChangemeA4!'
