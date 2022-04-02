@@ -57,9 +57,10 @@ vault_content_general:
     < Informative name>:`
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
+    static_value: <static content>
 ```
 
 Generated content on the Ansible Vault is like:
@@ -72,15 +73,20 @@ Generated content on the Ansible Vault is like:
   < Informative name>:
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
+    static_value: <static content>
     # List of host that normally would be ansible_hostnames and will be added end of the name parameter
     host:
       - <ansible hostnames 1>
       - <ansible hostnames 2>
       - <ansible hostnames n>
 ```
+
+
+Please, note that using static type is not secure since the password are in clear text in the configuration file. This type could also be also used to store some other values like pregenerated keys.
+
 
 Generated content on the Ansible Vault is like:
 ```

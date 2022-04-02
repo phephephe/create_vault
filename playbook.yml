@@ -13,7 +13,7 @@
 
     - name: "_vault_config_file"
       prompt: "Please, enter file path and file name (e.g. ̃~/vault_config.yml) containing the vault content configuration variable"
-      default: '../files/example_vault_config.yml'
+      default: '../files/example_vault_config_file.yml'
       private: 'no'
   
     #- name: "_use_password_file"

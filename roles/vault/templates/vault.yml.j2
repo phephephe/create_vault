@@ -23,6 +23,8 @@
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ item.name }}: '{{ passwd_to_hash }}'
 {{ item.name }}_sha512: '{{ passwd_to_hash | password_hash('sha512', salt) }}'
+{% elif item.password_type == 'static' %}
+{{ item.name }}: '{{ item.static_value }}'
 {% else %}
 {{ item.name }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}
@@ -49,6 +51,8 @@
 {% set salt = lookup('password', '/dev/null chars=ascii_lowercase,digits length=8') %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ passwd_to_hash }}'
 {{ vault_content_host[vault].name }}{{ host }}_sha512: '{{ passwd_to_hash | password_hash('sha512', salt ) }}'
+{% elif vault_content_host[vault].password_type == 'static' %}
+{{ vault_content_host[vault].name }}{{ host }}: '{{ vault_content_host[vault].static_value }}'
 {% else %}
 {{ vault_content_host[vault].name }}{{ host }}: '{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}'
 {% endif %}
