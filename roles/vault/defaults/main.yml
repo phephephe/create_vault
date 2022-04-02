@@ -2,17 +2,17 @@
 # Location of the target project's inventory
 target_inventory: '{{ playbook_dir }}/inventory'
 
-# Location of the vault file of the target project
-target_vault: 'group_vars/all/vault.yml'
+# Vault file name
+target_vault: 'vault.yml'
 
-# Location of the vault password file
-target_vault_password_file: '~/.vault_password.txt'
+# Vault Password file name
+target_vault_password_file: 'password.txt'
 
 # When enables (true) the password file will be encrypted using GPG
 gpg_passwordfile_enabled: false
 
 # List of usernames/email to be used for the encryption as recipient
-gpg_encryption_recipient_list: "[]"
+gpg_encryption_recipient_list: []
 
 # GPG command and path if needed e.g. gpg or gpg2
 gpg_command: 'gpg'
