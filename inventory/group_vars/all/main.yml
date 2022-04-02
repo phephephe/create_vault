@@ -2,8 +2,7 @@
 gpg_passwordfile_enabled: false
 
 # List of usernames/email to be used for the encryption as recipient
-gpg_encryption_recipient_list: "['']"
-
+gpg_encryption_recipient_list: []
 
 # 'Global' variables that are generic and not host specific.
 # Default example values, Should be overwrite using values on inventory 

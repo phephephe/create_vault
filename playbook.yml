@@ -5,6 +5,28 @@
       prompt: "Delete all current vaults and password files? (yes/no)"
       default: 'no'
       private: 'no'
+  
+    - name: "_vault_target_dir"
+      prompt: "Please, enter directory path where to store the new vault file"
+      default: '~/generated_vault'
+      private: 'no'
+
+    - name: "_vault_config_file"
+      prompt: "Please, enter file path and file name (e.g. ̃~/vault_config.yml) containing the vault content configuration variable"
+      default: '../files/example_vault_config_file.yml'
+      private: 'no'
+  
+    #- name: "_use_password_file"
+    #  prompt: "Delete all current vaults and password files? (yes/no)"
+    #  default: 'no'
+    #  private: 'no'
+
+    #- name: my_password2
+    #prompt: Enter password2
+    #private: yes
+    #encrypt: sha512_crypt
+    #confirm: yes
+    #salt_size: 7  
   tasks:
     - name: Create and generate the Vault
       import_role:

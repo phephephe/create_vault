@@ -1,26 +1,89 @@
 ---
+# This tasks generated Ansible vault and password file
+
+# Checks for permission
 - name: If user permission not received as yes, fail
   fail:
     msg: "The vault files and password files not deleted and new ones not generated. No permission received."
   when: "not 'yes' in delete_permission"
 
-- name: "This will overwrite the vault and vault password files are you sure to continue"
+# Warning
+- name: "This will overwrite the vault and vault password files are you sure to continue?"
   pause:
     prompt: |
-          ***************************************************
-                           ARE YOU SURE? 
-                           Yes, press 'Enter'
-                  If not then ctrl+C then 'A' = abort
-                  If you are sure then (ctrl+C then 'C' = continue)
-          ***************************************************
+          #  
+          *********************************************************************************
+                                            ARE YOU SURE? 
 
-- name: Get the vault dir path
+                                     Yes, press 'Enter'
+
+                                     If not then ctrl+C then 'A' = abort
+                                     If you are sure then (ctrl+C then 'C' = continue)
+          **********************************************************************************
+          #
+
+
+# Warning
+- name: "Vault password file will be encrypted using gpg."
+  pause:
+    prompt: |
+        The listed user's and their public keys must have been imported to gpg key storage
+        e.g. gpg --import keyfilename
+                                         
+                Have you done this to following recipients?
+                {{ gpg_encryption_recipient_list }}
+
+                                     Yes, press 'Enter'
+
+                                     If not then ctrl+C then 'A' = abort
+                                     If you are sure then (ctrl+C then 'C' = continue)
+          **********************************************************************************
+          #
+  when: gpg_passwordfile_enabled|bool
+
+# Vault dir path
+- set_fact:
+    vault_target_dir: "{{ _vault_target_dir }}"
+- debug:
+    var: vault_target_dir
+    verbosity: 1
+
+- name: Using vault configuration file
+  #include_vars: "{{ lookup('file', _vault_config_file) }}"
+  include_vars: "{{ _vault_config_file}}"
+
+- name: vault_content_general variable content
+  debug:  
+    var: vault_content_general
+    verbosity: 1
+- name: vault_content_host variable content
+  debug:
+    var: vault_content_host
+    verbosity: 1
+
+# GPG recipient list
+- name: Make correctly formated recipient list string
   set_fact:
-    vault_dir: "{{ target_inventory }}/{{ target_vault | dirname }}" 
+    recipient_list_str: "{{ recipient_list_str | default('') }} --recipient {{ item }}"
+  loop: "{{ gpg_encryption_recipient_list }}"
+  when: gpg_passwordfile_enabled|bool
+
+- debug:
+    var: recipient_list_str
+    verbosity: 1
+  when: gpg_passwordfile_enabled|bool
+
+# Vaualt dir
+- name: Create vault dir
+  file:
+    path: "{{ vault_target_dir }}" 
+    state: directory
+    mode: '0744'
+    recurse: yes
 
 - name: Get stats of the Target Vault dir
   stat:
-    path: "{{ vault_dir }}"
+    path: "{{ vault_target_dir }}"
   register: vault_dir_stat
 
 - name: The Vault dir is not present
@@ -30,112 +93,102 @@
 
 - name: Path Check Result
   debug:
-    msg: "Path {{ vault_dir }} exists and is a directory"
+    msg: "Path {{ vault_target_dir }} exists and is a directory"
   when: vault_dir_stat.stat.isdir is defined and vault_dir_stat.stat.isdir
 
+# Vault password file
 - name: Get the vault password file path
   set_fact:
-    vault_password_dir: "{{ target_vault_password_file | dirname }}" 
+    vault_password_dir: "{{ _vault_target_dir }}" 
 
-- name: Get stats of the Target Vault password dir
-  stat:
-    path: "{{ vault_password_dir }}"
-  register: vault_password_dir_stat
-
-- name: The Vault password file dir is not present
-  fail:
-    msg: "The Vault dir {{ vault_password_dir }} is not present"
-  when: vault_password_dir_stat.stat.isdir is not defined or not vault_password_dir_stat.stat.isdir
-
-- name: Path Check Result
-  debug:
-    msg: "Path {{ vault_password_dir }} exists and is a directory"
-  when: vault_password_dir_stat.stat.isdir is defined and vault_password_dir_stat.stat.isdir
-
-- name: Generate vault password, if not present
+- name: Generate vault password
   set_fact:
-    vault_passwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=62' ) }}"
+    vault_passwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=86' ) }}"
 
 - name: Copy Vault password template to localhost
   template:
     src: 'vault_passwd.yml.j2'
-    dest: "{{ target_vault_password_file }}"
+    dest: "{{ vault_password_dir}}/{{ target_vault_password_file }}"
     mode: '640'
   no_log: 'yes'
-  when: not gpg_passwordfile_enabled 
+  when: not gpg_passwordfile_enabled|bool or gpg_encryption_recipient_list|length==0
 
 - name: Make sure that any clear text password files are not present when gpg is used
   file:
-    path: "{{ target_vault_password_file }}"
+    path: "{{ vault_password_dir}}/{{ target_vault_password_file }}"
     state: 'absent'
-  when: gpg_passwordfile_enabled
+  when: gpg_passwordfile_enabled|bool and gpg_encryption_recipient_list|length>0
 
+# Vault
 - name: Copy Vault clear template to localhost
   template:
     src: 'vault.yml.j2'
-    dest: "{{ target_inventory }}/{{ target_vault }}"
+    dest: "{{ vault_target_dir }}/{{ target_vault }}"
     mode: '640'
   no_log: 'no'  
 
+# Vault
 - name: Copy ansible-vault.sh to be used with gpg
   template:
     src: 'gpg_ansible-vault.sh.j2'
-    dest: "~/.ansible-vault.sh"
+    dest: "{{ vault_password_dir }}/ansible-vault.sh"
     mode: '750'
-  when: gpg_passwordfile_enabled
+  when: gpg_passwordfile_enabled|bool and gpg_encryption_recipient_list|length>0
 
 - name: Copy ansible-vault.sh to be used with clear text
   template:
     src: 'txt_ansible-vault.sh.j2'
-    dest: "~/.ansible-vault.sh"
+    dest: "{{ vault_password_dir }}/ansible-vault.sh"
     mode: '750'
-  when: not gpg_passwordfile_enabled
-
-- name: Make correctly formated recipient list string
-  set_fact:
-    recipient_list_str: "{{ recipient_list_str | default('') }} --recipient {{ item }}"
-  loop: "{{ gpg_encryption_recipient_list }}"
-  when: gpg_passwordfile_enabled
-
-- debug:
-    var: recipient_list_str
-  when: gpg_passwordfile_enabled
+  when: not gpg_passwordfile_enabled|bool or gpg_encryption_recipient_list|length==0
 
 - name: GPG encrypt the password file
-  shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ target_vault_password_file }}.gpg"
-  no_log: 'yes'
-  when: gpg_passwordfile_enabled
+  shell: "echo '{{ vault_passwd }}' | {{ gpg_command }} --encrypt {{ recipient_list_str }} -o {{ vault_password_dir }}/{{ target_vault_password_file }}.gpg"
+  #no_log: 'yes'
+  when: gpg_passwordfile_enabled|bool and gpg_encryption_recipient_list|length>0
 
 - name: Encrypt the Ansible vault by using clear txt password file
-  command: 'ansible-vault encrypt --vault-password-file {{ target_vault_password_file }} --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
-  no_log: 'yes'
-  when: not gpg_passwordfile_enabled
+  command: 'ansible-vault encrypt --vault-password-file {{ vault_password_dir }}/{{ target_vault_password_file }} --encrypt-vault-id default {{ vault_target_dir }}/{{ target_vault }}'
+  #no_log: 'yes'
+  when: not gpg_passwordfile_enabled|bool or gpg_encryption_recipient_list|length==0
+
+- debug:
+    msg: "{{ vault_password_dir }}/{{ target_vault_password_file  }}"
+    verbosity: 1
+
+- debug:
+    msg: "{{ vault_target_dir }}/{{ target_vault }}"
+    verbosity: 1
 
 - name: Encrypt the Ansible vault using pgp encrypted password file
-  shell: 'ansible-vault encrypt --vault-password-file "$(cat {{ target_vault_password_file }})" --encrypt-vault-id default {{ target_inventory }}/{{ target_vault }}'
-  no_log: 'yes'
-  when: gpg_passwordfile_enabled
+  shell: 'ansible-vault encrypt --vault-password-file={{ vault_password_dir }}/ansible-vault.sh --encrypt-vault-id default {{ vault_target_dir }}/{{ target_vault }}'
+  #no_log: 'yes'
+  when: gpg_passwordfile_enabled|bool and gpg_encryption_recipient_list|length>0
 
 - pause:
     seconds: 1
     prompt: |
           =========================
           New clear text Ansible Vault password file created with a random password.
-          The password file location: {{ target_vault_password_file }}
+          The password file location: {{ vault_password_dir }}/{{ target_vault_password_file }}
 
           New Ansible Vault created with generated random passwords.
-          The Vault location: {{ target_inventory }}/{{ target_vault }}
+          The Vault location: {{ vault_target_dir }}/{{ target_vault }}
+
+          Store the Vault password files to different secure location than the Vault file.
           =========================
-  when: not gpg_passwordfile_enabled 
+  when: not gpg_passwordfile_enabled|bool 
 
 - pause:
     seconds: 1
     prompt: |
           =========================
           New GPG encrypted Ansible Vault password file created with a random password.
-          The password file location: {{ target_vault_password_file }}
+          The password file location: {{ vault_password_dir }}/{{ target_vault_password_file }}
 
           New Ansible Vault created with generated random passwords.
-          The Vault location: {{ target_inventory }}/{{ target_vault }}
+          The Vault location: {{ vault_target_dir }}/{{ target_vault }}
+
+          Use -vault-password-file={{ vault_target_dir }}/{ansible-vault.sh and/or store it to ansible.cfg 
           =========================
-  when: gpg_passwordfile_enabled        
+  when: gpg_passwordfile_enabled|bool        

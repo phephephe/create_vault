@@ -2,56 +2,51 @@
 
 ## Summary
 
-This project aims to automate the Ansible Vault password content generation.
+This project aims to automates the Ansible Vault password content generation.
 
-The Ansible Vault password file is generated and stored to the defined password file on '~/' directory. Optionally it can be GPG encrypted.
+The Ansible Vault file is stored to a directory, which is asked from user during the play.
 
-## Usage
+The Ansible Vault password file is generated and stored to the directory. Optionally it can be GPG encrypted.
 
-Make backup the vault.yml and password file before running the following play, if needed.
+## Usage - Generating the Ansible Vault content
 
-When using GPG encryption on the password file, make sure that GPG is ready to be used. E.g. add key info to the local inventory/group_vars/all/mail.yml 'gpg_encryption_recipient_list' variable. GPG private key should be on hardware e.g. Yubikey.
+During the play following items are asked from the user: 
+* Target directory for the results.
+  * vault.yml
+  * password.txt / password.txt.gpg
+  * ansible-vault.sh
+
+* Source configuration file containing at least following variables:
+  * vault_content_general
+  * vault_content_host
+
+Make backup the vault.yml and password file before running the following play.
+
+When using GPG encryption on the password file, make sure that GPG is ready to be used and needed keys have been imported to gpg keyring.
+E.g. add key info to the 'gpg_encryption_recipient_list' variable. GPG private key should be on hardware e.g. Yubikey.
 
 Following command is used to run the play.
 ```
 ansible-playbook playbook.yml
 ```
-Also, following command can be used when real inventory file is else where
-```
-ansible-playbook -i INVENTORY playbook.yml
-```
 
-If vault file has already been created, you need to provide the vault password to rerun the playbook. ('ERROR! Attempting to decrypt but no vault secrets found')
-Example below provides example with default settings:
-```
-ansible-playbook --vault-id VAULT_PASSWORD_FILE playbook.yml
-```
-or 
-```
-ansible-playbook --vault-password-file VAULT_PASSWORD_FILES playbook.yml
-```
-or
-```
-ansible-playbook -i INVENTORY --vault-password-file VAULT_PASSWORD_FILES playbook.yml
-```
+Current version does not support updating existing Ansible vaults.
 
-For example first run
-```
-ansible-playbook -i ../MyFoE_inventory/development/hosts playbook.yml
-```
-
-For example subsequent runs
-```
-ansible-playbook -i ../MyFoE_inventory/development/hosts --vault-password-file ~/.vault_password.txt playbook.yml
-```
-Or also when gpg is used (works also without gpg)
-```
-ansible-playbook -i ../MyFoE_inventory/development/hosts --vault-password-file ~/.ansible-vault.sh playbook.yml
-```
+## Usage during normal operation
 
 
-This play will generated passwords to Ansible vault to:
-* "{{ target_inventory }}/{{ target_vault }}"
+```
+cd < to your project >
+ansible-playbook -i < path to inventory >/hosts.yml --vault-password-file=<path>/ansible-vault.sh playbook.yml
+```
+or following if you have added vault_password_file = <path>/ansible-vault.sh' to ansible.cfg
+```
+cd < to your project >
+ansible-playbook -i < path to inventory >/hosts.yml playbook.yml
+```
+
+# Details
+
 
 The generated passwords are defined using two variables:
 * vault_content_general
@@ -59,12 +54,13 @@ The generated passwords are defined using two variables:
 
 ```
 vault_content_general:
-    < Informative nam>:`
+    < Informative name>:`
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
+    static_value: <static content>
 ```
 
 Generated content on the Ansible Vault is like:
@@ -74,12 +70,13 @@ Generated content on the Ansible Vault is like:
 ``` 
 ```
  Host specific values.
-  < Informative nam>:
+  < Informative name>:
     comment: '< comment that will be stored to the vault>'
     name: '< variable name to store the password >' 
-    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512'
+    # Password type possible values: 'simple', 'normal', 'human', 'unix-hash-sha256', 'unix-hash-sha512', 'static'
     # These values are used on vault.yml.j2 to select different type of password quality
     password_type: 'normal'
+    static_value: <static content>
     # List of host that normally would be ansible_hostnames and will be added end of the name parameter
     host:
       - <ansible hostnames 1>
@@ -87,13 +84,17 @@ Generated content on the Ansible Vault is like:
       - <ansible hostnames n>
 ```
 
+
+Please, note that using static type is not secure since the password are in clear text in the configuration file. This type could also be also used to store some other values like pregenerated keys.
+
+
 Generated content on the Ansible Vault is like:
 ```
  # comment
  <name><host>: <random password>
 ```
 
-**The project that used these generated password needs to add 'vault_password_file = ~/.ansible-vault.sh' to ansible.cfg.**
+**The project that used these generated password needs to add 'vault_password_file = <path>/ansible-vault.sh' to ansible.cfg.**
 
 ## More information
 

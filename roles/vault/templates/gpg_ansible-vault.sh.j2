@@ -1,2 +1,2 @@
 #!/bin/bash
-gpg --decrypt --quiet --batch {{ target_vault_password_file }}.gpg
+gpg --decrypt --quiet --batch --use-agent {{ vault_target_dir }}/{{ target_vault_password_file }}.gpg
