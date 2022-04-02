@@ -1,8 +1,8 @@
 # When enables (true) the password file will be encrypted using GPG
-gpg_passwordfile_enabled: false
+#gpg_passwordfile_enabled: false
 
 # List of usernames/email to be used for the encryption as recipient
-gpg_encryption_recipient_list: []
+#gpg_encryption_recipient_list: []
 
 
 # 'Global' variables that are generic and not host specific.

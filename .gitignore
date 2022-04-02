@@ -14,7 +14,7 @@
 # Ansible
 *.retry
 vault.yml
-vault
+.vault
 
 # OS X
 .DS_Store
